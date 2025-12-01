@@ -4,59 +4,145 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/styles/theme.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <title>Supermarket App</title>
 </head>
 <body>
-    <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="/">Supermarket App</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
-          <span class="navbar-toggler-icon"></span>
-        </button>
+  <nav class="navbar navbar-expand-sm navbar-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand brand-accent" href="/">Supermarket App</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
+        <span class="navbar-toggler-icon"></span>
+      </button>
 
-        <div class="collapse navbar-collapse" id="collapsibleNavbar">
-          <ul class="navbar-nav ms-auto">
-            <% if (!user) { %>
+      <div class="collapse navbar-collapse" id="collapsibleNavbar">
+        <ul class="navbar-nav ms-auto">
+          <% if (!user) { %>
+            <li class="nav-item">
+              <a class="nav-link" href="/register">Register</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/login">Login</a>
+            </li>
+          <% } else { %>
+            <li class="nav-item">
+              <a class="nav-link" href="/shopping">Shop</a>
+            </li>
+            <% if (user.role !== 'admin') { %>
               <li class="nav-item">
-                <a class="nav-link" href="/register">Register</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/login">Login</a>
-              </li>
-            <% } else { %>
-              <li class="nav-item">
-                <a class="nav-link" href="/shopping">Shop</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/cart">View Cart</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/logout">Logout</a>
+                <a class="nav-link" href="/cart">Cart</a>
               </li>
             <% } %>
-          </ul>
+            <% if (user.role === 'admin') { %>
+              <li class="nav-item">
+                <a class="nav-link" href="/inventory">Inventory</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/users">Users</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/feedback-status">Feedback (admin)</a>
+              </li>
+            <% } %>
+            <li class="nav-item">
+              <a class="nav-link" href="/logout">Logout</a>
+            </li>
+          <% } %>
+          <% if (user) { %>
+              <% if (user.role !== 'admin') { %>
+                <li class="nav-item">
+                  <a class="nav-link" href="/feedback">Feedback</a>
+                </li>
+              <% } %>
+            <% } %>
+          <li class="nav-item">
+            <a class="nav-link" href="/contact-us">Contact Us</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container page-shell">
+    <div class="hero">
+      <div class="hero-split">
+        <div class="hero-text">
+          <p class="text-uppercase small text-primary fw-semibold mb-2">Stay healthy</p>
+          <h1 class="display-6 fw-bold mb-2">Fresh groceries delivered <span class="hero-highlight">bright & fast</span></h1>
+          <p class="text-muted mb-3">Pick your favorites, add to cart, and check out in minutes. Fresh produce and pantry essentials, ready when you are.</p>
+          <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-primary btn-rounded btn-glow" href="/shopping">Shop now</a>
+            <% if (!user) { %>
+              <a class="btn btn-outline-secondary btn-rounded" href="/register">Create account</a>
+            <% } else { %>
+              <a class="btn btn-outline-secondary btn-rounded" href="/cart">View cart</a>
+            <% } %>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <% if (featuredProducts && featuredProducts[0] && featuredProducts[0].image) { %>
+            <img src="/images/<%= featuredProducts[0].image %>" alt="Fresh produce">
+          <% } %>
         </div>
       </div>
-    </nav>
+    </div>
 
-    <div class="container text-center mt-5">
-      <% if (user) { %>
-        <% if (user.role === "admin") { %>
-          <h2>Welcome back, <%= user.username %> (admin)</h2>
-          <p class="mt-3">Go to <a href="/inventory">Inventory</a></p>
-        <% } else { %>
-          <h2>Welcome back, <%= user.username %></h2>
-          <p class="mt-3">Continue <a href="/shopping">Shopping</a></p>
-        <% } %>
-      <% } else { %>
-        <h1>Welcome to Supermarket App</h1>
-        <p class="lead mt-3">Please register or login to continue.</p>
-        <div class="d-flex justify-content-center gap-3 mt-4">
-          <a class="btn btn-primary btn-lg" href="/register">Register</a>
-          <a class="btn btn-outline-primary btn-lg" href="/login">Login</a>
+    <div class="steps-bar my-3">
+      <div class="steps">
+        <div class="step-card">
+          <span class="step-icon">1</span>
+          <div>
+            <div class="fw-semibold">Select products</div>
+            <div class="text-muted small">Browse fresh picks</div>
+          </div>
         </div>
+        <div class="step-card">
+          <span class="step-icon">2</span>
+          <div>
+            <div class="fw-semibold">Add to cart</div>
+            <div class="text-muted small">Your basket, your pace</div>
+          </div>
+        </div>
+        <div class="step-card">
+          <span class="step-icon">3</span>
+          <div>
+            <div class="fw-semibold">Checkout</div>
+            <div class="text-muted small">Secure and quick</div>
+          </div>
+        </div>
+        <div class="step-card">
+          <span class="step-icon">4</span>
+          <div>
+            <div class="fw-semibold">Delivery</div>
+            <div class="text-muted small">On the way to you</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="section-title">Featured Products</h3>
+    <p class="section-subtitle">Curated picks to inspire your next meal.</p>
+    <div class="product-grid">
+      <% if (featuredProducts && featuredProducts.length) { %>
+        <% featuredProducts.forEach(p => { %>
+          <div class="product-card">
+            <div class="position-absolute top-0 end-0 m-2">
+              <span class="badge bg-success text-white">Fresh</span>
+            </div>
+            <a href="/product/<%= p.productId %>">
+              <img src="/images/<%= p.image %>" alt="<%= p.name %>">
+            </a>
+            <h6 class="mt-2 mb-1"><%= p.name %></h6>
+            <div class="price">$<%= Number(p.price).toFixed(2) %></div>
+            <div class="text-muted small mb-2">Stock: <%= p.quantity %></div>
+            <a class="btn btn-sm btn-primary btn-rounded" href="/product/<%= p.productId %>">View</a>
+          </div>
+        <% }) %>
+      <% } else { %>
+        <p class="text-muted">No products yet. Please add some in inventory.</p>
       <% } %>
     </div>
+  </div>
 </body>
 </html>

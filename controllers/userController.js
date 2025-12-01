@@ -3,9 +3,20 @@ const User = require('../models/user');
 const UserController = {
   // List all users
   list(req, res) {
-    User.getAll((err, results) => {
+    const roleFilter = (req.query.role || 'all').toLowerCase();
+
+    User.getAll((err, users) => {
       if (err) return res.status(500).json({ error: 'Failed to fetch users', details: err.message });
-      return res.status(200).json(results);
+
+      const filtered = (roleFilter === 'admin' || roleFilter === 'user')
+        ? users.filter(u => (u.role || '').toLowerCase() === roleFilter)
+        : users;
+
+      return res.render('users', {
+        users: filtered,
+        totalUsers: filtered.length,
+        selectedRole: roleFilter
+      });
     });
   },
 
@@ -72,12 +83,38 @@ const UserController = {
   // Delete a user
   delete(req, res) {
     const id = req.params.id || req.params.userId;
-    if (!id) return res.status(400).json({ error: 'User ID is required' });
+    if (!id) {
+      req.flash('error', 'User ID is required');
+      return res.redirect('/users');
+    }
 
-    User.delete(id, (err, result) => {
-      if (err) return res.status(500).json({ error: 'Failed to delete user', details: err.message });
-      if (result.affectedRows === 0) return res.status(404).json({ error: 'User not found' });
-      return res.status(200).json({ message: 'User deleted' });
+    // Fetch to ensure we do not delete admin users
+    User.getById(id, (fetchErr, user) => {
+      if (fetchErr) {
+        req.flash('error', 'Failed to fetch user');
+        return res.redirect('/users');
+      }
+      if (!user) {
+        req.flash('error', 'User not found');
+        return res.redirect('/users');
+      }
+      if (user.role === 'admin') {
+        req.flash('error', 'Cannot delete admin users');
+        return res.redirect('/users');
+      }
+
+      User.delete(id, (err, result) => {
+        if (err) {
+          req.flash('error', 'Failed to delete user');
+          return res.redirect('/users');
+        }
+        if (result.affectedRows === 0) {
+          req.flash('error', 'User not found');
+          return res.redirect('/users');
+        }
+        req.flash('success', 'User deleted');
+        return res.redirect('/users');
+      });
     });
   }
 };

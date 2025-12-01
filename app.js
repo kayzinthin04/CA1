@@ -66,6 +66,13 @@ const checkAdmin = (req, res, next) => {
     res.redirect('/shopping');
 };
 
+const disallowAdminFeedback = (req, res, next) => {
+    if (req.session.user && req.session.user.role === 'admin') {
+        return res.redirect('/feedback-status');
+    }
+    return next();
+};
+
 const validateRegistration = (req, res, next) => {
     const { username, email, password, address, contact, role } = req.body;
 
@@ -91,18 +98,26 @@ const ProductController = require('./controllers/productController');
 const UserController = require('./controllers/userController');
 const CartController = require('./controllers/cartController');
 const CheckoutController = require('./controllers/checkoutController');
+const ProductModel = require('./models/product');
+const FeedbackController = require('./controllers/feedbackController');
+const ContactController = require('./controllers/contactController');
 
 // =============================
 // HOME ROUTE
 // =============================
-app.get('/', (req, res) => res.render('index'));
+app.get('/', (req, res) => {
+    ProductModel.getAll((err, products) => {
+        const featuredProducts = (products || []).slice(0, 8);
+        return res.render('index', { featuredProducts });
+    });
+});
 
 // =============================
 // PRODUCT ROUTES
 // =============================
 app.get('/inventory', checkAuthenticated, checkAdmin, ProductController.list);
-app.get('/shopping', checkAuthenticated, ProductController.list);
-app.get('/product/:id', checkAuthenticated, ProductController.getById);
+app.get('/shopping', ProductController.list);
+app.get('/product/:id', ProductController.getById);
 
 app.get('/addProduct', checkAuthenticated, checkAdmin, (req, res) => {
     res.render('addProduct');
@@ -184,6 +199,19 @@ app.get('/users/delete/:id', checkAuthenticated, checkAdmin, UserController.dele
 app.get('/users/:id', checkAuthenticated, checkAdmin, UserController.getById);
 app.post('/users', checkAuthenticated, checkAdmin, UserController.add);
 app.post('/users/:id', checkAuthenticated, checkAdmin, UserController.update);
+
+// =============================
+// CONTACT ROUTES
+// =============================
+app.get('/contact-us', ContactController.view);
+app.post('/contact-us', checkAuthenticated, checkAdmin, ContactController.update);
+
+// =============================
+// FEEDBACK ROUTES
+// =============================
+app.get('/feedback', disallowAdminFeedback, FeedbackController.form);
+app.post('/feedback', disallowAdminFeedback, FeedbackController.submit);
+app.get('/feedback-status', checkAuthenticated, checkAdmin, FeedbackController.status);
 
 // =============================
 // SERVER

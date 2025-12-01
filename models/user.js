@@ -53,6 +53,19 @@ const UserModel = {
   delete(userId, callback) {
     const sql = 'DELETE FROM users WHERE userId = ?';
     db.query(sql, [userId], (err, result) => callback(err, result));
+  },
+
+  /**
+   * Count total users
+   * callback(err, count)
+   */
+  countAll(callback) {
+    const sql = 'SELECT COUNT(*) AS total FROM users';
+    db.query(sql, (err, results) => {
+      if (err) return callback(err);
+      const total = results?.[0]?.total || 0;
+      callback(null, total);
+    });
   }
 };
 
