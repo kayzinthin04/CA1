@@ -1,4 +1,5 @@
 const ProductModel = require('../models/product');
+const OrderModel = require('../models/order');
 
 const CheckoutController = {};
 
@@ -51,19 +52,26 @@ CheckoutController.confirm = async (req, res) => {
             })
         );
 
-        const order = {
-            id: Date.now(),
-            items: cart,
-            total,
-            createdAt: new Date(),
-            user: req.session.user.username
-        };
+        OrderModel.addOrder(req.session.user, cart, total, (orderErr, saved) => {
+            if (orderErr) {
+                req.flash('error', 'Order was charged but could not be saved to history.');
+                return res.redirect('/checkout');
+            }
 
-        req.session.lastOrder = order;
-        delete req.session.cart;
+            const order = {
+                id: saved.orderId,
+                items: cart,
+                total,
+                createdAt: new Date(),
+                user: req.session.user.username
+            };
 
-        req.flash('success', 'Your order has been placed successfully!');
-        res.redirect('/order-confirmation');
+            req.session.lastOrder = order;
+            delete req.session.cart;
+
+            req.flash('success', 'Your order has been placed successfully!');
+            res.redirect('/order-confirmation');
+        });
 
     } catch (err) {
         const msg =

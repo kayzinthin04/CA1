@@ -1,0 +1,61 @@
+<nav class="navbar navbar-expand-sm navbar-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand brand-accent" href="/">Supermarket App</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="mainNavbar">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/shopping">Shop</a>
+        </li>
+
+        <% if (user && user.role === 'admin') { %>
+          <li class="nav-item">
+            <a class="nav-link" href="/inventory">Inventory</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/users">Users</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/history/all">History (all users)</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/feedback-status">Feedback (admin)</a>
+          </li>
+        <% } %>
+
+        <% if (user && user.role !== 'admin') { %>
+          <li class="nav-item">
+            <a class="nav-link" href="/cart">Cart</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/history">History</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/feedback">Feedback</a>
+          </li>
+        <% } %>
+
+        <li class="nav-item">
+          <a class="nav-link" href="/contact-us">Contact Us</a>
+        </li>
+
+        <% if (!user) { %>
+          <li class="nav-item">
+            <a class="nav-link" href="/register">Register</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/login">Login</a>
+          </li>
+        <% } else { %>
+          <li class="nav-item">
+            <a class="nav-link" href="/logout">Logout</a>
+          </li>
+        <% } %>
+      </ul>
+    </div>
+  </div>
+</nav>
+<%- include('toast') %>

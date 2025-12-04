@@ -101,6 +101,7 @@ const CheckoutController = require('./controllers/checkoutController');
 const ProductModel = require('./models/product');
 const FeedbackController = require('./controllers/feedbackController');
 const ContactController = require('./controllers/contactController');
+const HistoryController = require('./controllers/historyController');
 
 // =============================
 // HOME ROUTE
@@ -145,6 +146,12 @@ app.get('/cart/remove/:idx', checkAuthenticated, CartController.remove);
 app.get('/checkout', checkAuthenticated, CheckoutController.view);
 app.post('/checkout/confirm', checkAuthenticated, CheckoutController.confirm);
 app.get('/order-confirmation', checkAuthenticated, CheckoutController.orderConfirmation);
+
+// =============================
+// ORDER HISTORY ROUTES
+// =============================
+app.get('/history', checkAuthenticated, HistoryController.userHistory);
+app.get('/history/all', checkAuthenticated, checkAdmin, HistoryController.allHistory);
 
 // =============================
 // AUTH ROUTES
